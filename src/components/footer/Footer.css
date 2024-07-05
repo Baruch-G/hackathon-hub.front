@@ -1,6 +1,17 @@
 .footer {
+  width: 100%;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+
+}
+
+@media (max-width: 480px) {
+  .footer {
     width: 100%;
     position: fixed;
     z-index: 1000;
     bottom: 0;
+    top: unset;
+  }
 }

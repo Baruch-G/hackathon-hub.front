@@ -1,0 +1,93 @@
+/* HackathonList.css */
+
+.hackathon-list {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    margin-bottom: 50px;
+    margin-top: 50px;
+  }
+  
+  .hackathon-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .hackathon-item .hackathon-header {
+    margin-bottom: 10px;
+  }
+  
+  .hackathon-item h2 {
+    margin: 0 0 5px;
+    font-size: 1.5rem;
+  }
+  
+  .hackathon-item p {
+    margin: 0;
+    color: #666;
+  }
+  
+  .hackathon-details {
+    margin-bottom: 10px;
+  }
+  
+  .hackathon-details p {
+    margin-bottom: 5px;
+  }
+  
+  .hackathon-images {
+    display: flex;
+    margin-bottom: 10px;
+  }
+  
+  .hackathon-images img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 10px;
+  }
+  
+  .hackathon-actions {
+    margin-bottom: 10px;
+  }
+  
+  .hackathon-actions button {
+    margin-right: 10px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .hackathon-actions button:hover {
+    background-color: #0056b3;
+  }
+  
+  .hackathon-comments {
+    margin-top: 10px;
+  }
+  
+  .hackathon-comments h3 {
+    margin: 0 0 5px;
+    font-size: 1.2rem;
+  }
+  
+  .hackathon-comments ul {
+    padding-left: 0; /* Remove default padding */
+    list-style-type: none; /* Remove default list-style (bullets) */
+  }
+  
+  .hackathon-comments ul li {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc; /* Add a bottom border for separation */
+    padding-bottom: 10px; /* Add some padding below each comment */
+  }
+  
