@@ -2,13 +2,15 @@
 import { GiTank } from "react-icons/gi";
 import { AiOutlineUser } from "react-icons/ai";
 import { HiInformationCircle } from "react-icons/hi";
-import { BsAirplaneEnginesFill } from "react-icons/bs";
+import { BsAirplaneEnginesFill, BsMap } from "react-icons/bs";
 import { RouteObject } from "react-router-dom";
 import { ElementType, ReactNode } from "react";
 import App from "../../App";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { CiViewList } from "react-icons/ci";
 import HackathonList from "../hackathonList/HackathonList";
+import AddHackathon from "../addPost/AddHackathon";
+import { ImageDropZone } from "../imgaeDropZone/ImageDropZone";
 
 export type HackathonTab = RouteObject & {
     icon: ElementType,
@@ -23,7 +25,7 @@ export const tabs = [
             {
                 icon: IoAddCircleSharp,
                 path: "/hackathon/add",
-                element: <div>d</div>,
+                element: <AddHackathon onSubmit={() => {}} />,
                 title: "add hackathon"
             },
             {
@@ -35,8 +37,15 @@ export const tabs = [
             {
                 icon: BsAirplaneEnginesFill,
                 path: "/hackathon/edit",
-                element: <div>d</div>,
+                element: <ImageDropZone />,
                 title: "edit hackathon"
-            }]
+            },
+            {
+                icon: BsMap,
+                path: "/hackathon/map",
+                element: < div/>,
+                title: "hackathon map"
+            }
+        ]
     }
 ];

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./CommentForm.css"
 
 interface CommentFormProps {
     hackathonId: number;
@@ -25,7 +26,7 @@ interface CommentFormProps {
           rows={3}
           required
         />
-        <button type="submit">Add Comment</button>
+        <button className="hac-btn" type="submit">Add Comment</button>
       </form>
     );
   }

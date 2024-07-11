@@ -1,0 +1,58 @@
+.add-hackathon {
+  max-width: 1000px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-hackathon h2 {
+  text-align: center;
+}
+
+.post-hackathon {
+  display: grid;
+  gap: 15px;
+}
+
+.post-hackathon label {
+  display: block;
+  font-weight: bold;
+}
+
+.post-hackathon textarea,
+.post-hackathon input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.post-hackathon textarea {
+  resize: vertical;
+  height: 100px;
+}
+
+.post-hackathon .error {
+  border-color: #e74c3c;
+}
+
+.post-hackathon .error-text {
+  color: #e74c3c;
+  margin-top: 5px;
+  font-size: 0.875rem;
+}
+
+.post-hackathon button {
+  width: 100%;
+  display: block;
+  transition: background-color 0.3s ease;
+}
+
+.date-range-inputs {
+  display: flex;
+  gap: 30px;
+}

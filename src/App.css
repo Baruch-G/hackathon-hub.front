@@ -4,10 +4,35 @@ body {
   display: flex;
   justify-content: center;
   font-family: 'Roboto', sans-serif;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
 }
 
 #root {
   max-width: 1000px;
   width: 100%;
   margin: 0 auto;
+}
+
+.app {
+  margin-top: 80px;
+  margin-bottom: 80px;
+  padding: 0px 10px;
+}
+
+.app .burger {
+  position: fixed;
+  top: 0;
+  z-index: 2000;
+  left: 0;
+  font-size: 25;
+  padding: 10px;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .app .burger {
+    position: absolute;
+  }
 }
