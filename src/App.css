@@ -3,7 +3,7 @@ body {
   padding: 0;
   display: flex;
   justify-content: center;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
@@ -29,10 +29,40 @@ body {
   font-size: 25;
   padding: 10px;
   cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.burger.open {
+  transform: rotate(90deg);
+}
+
+.top-profile {
+  position: fixed;
+  right: 0;
+  top: 0;
+  padding: 10px;
+  z-index: 1199;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+}
+
+.top-profile-img {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
 }
 
 @media (max-width: 480px) {
   .app .burger {
+    position: absolute;
+  }
+
+  .top-profile {
     position: absolute;
   }
 }

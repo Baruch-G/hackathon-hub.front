@@ -28,7 +28,7 @@ const Footer = () => {
               tab.icon &&
               <MuiBottomNavigationAction
                 sx={{
-                  "&.Mui-selected": { color: "#1A434E" },
+                  "&.Mui-selected": { color: "#054475" },
                   bgcolor: 'white'
                 }}
                 key={tab.path}

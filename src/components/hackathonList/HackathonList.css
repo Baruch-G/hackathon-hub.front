@@ -36,7 +36,7 @@
 }
 
 .hackathon-poster-name:hover {
-  color: #1a434e;
+  color: #054475;
 }
 
 .profile-img {
@@ -83,12 +83,12 @@
 }
 
 .icon-fill {
-  color: #1a434e;
+  color: #054475;
 }
 
 .icon-button:hover {
   transform: scale(1.2);
-  color: #1a434e;
+  color: #054475;
 }
 
 .icon-button:active {

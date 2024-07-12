@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { TextField, Button, Box } from '@mui/material';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import AdapterDateFns from '@mui/x-date-pickers/AdapterDateFns';
 import './AddHackathon.css';
 import { ImageDropZone } from '../imgaeDropZone/ImageDropZone';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 interface AddHackathonProps {
   onSubmit: (post: { description: string, startDate: Date | null, endDate: Date | null, location: number | null }) => void;
@@ -59,57 +61,60 @@ const AddHackathon = (props: AddHackathonProps) => {
   };
 
   return (
-    <div className="add-hackathon">
+    <Box className="add-hackathon">
       <h2>Add Hackathon</h2>
-      <form onSubmit={handleSubmit} className="post-hackathon">
-        <div className="form-group">
-          <label>Write some details:</label>
-          <textarea
+      <Box component="form" onSubmit={handleSubmit} className="post-hackathon">
+        <Box className="form-group">
+          <TextField
+            label="Write some details"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className={errors.description ? 'error' : ''}
+            error={Boolean(errors.description)}
+            helperText={errors.description}
+            fullWidth
+            multiline
+            rows={4}
           />
-          {errors.description && <p className="error-text">{errors.description}</p>}
-        </div>
-        <div className="form-group">
-          <label>Location:</label>
-          <input
+        </Box>
+        <Box className="form-group">
+          <TextField
+            label="Location"
             type="number"
             value={location !== null ? location : ''}
             onChange={(e) => setLocation(e.target.value ? parseInt(e.target.value) : null)}
-            className={errors.location ? 'error' : ''}
-            placeholder="Enter location"
+            error={Boolean(errors.location)}
+            helperText={errors.location}
+            fullWidth
           />
-          {errors.location && <p className="error-text">{errors.location}</p>}
-        </div>
-        <div className='form-group date-range-inputs'>
-          <div>
-            <label>Start Date:</label>
-            <DatePicker
-              selected={startDate}
-              onChange={(date: Date | null) => setStartDate(date)}
-              className={errors.startDate ? 'error' : ''}
-              placeholderText="Select start date"
-            />
-            {errors.startDate && <p className="error-text">{errors.startDate}</p>}
-          </div>
-          <div>
-            <label>End Date:</label>
-            <DatePicker
-              selected={endDate}
-              onChange={(date: Date | null) => setEndDate(date)}
-              className={errors.endDate ? 'error' : ''}
-              placeholderText="Select end date"
-            />
-            {errors.endDate && <p className="error-text">{errors.endDate}</p>}
-          </div>
-        </div>
-        <div className='form-group'>
+        </Box>
+        <Box className='form-group date-range-inputs'>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Box>
+              <DatePicker
+                label="Start Date"
+                value={startDate}
+                onChange={(date: Date | null) => setStartDate(date)}
+                slotProps={{ textField: { error: Boolean(errors.startDate), helperText: errors.startDate } }}
+              />
+            </Box>
+            <Box>
+              <DatePicker
+                label="End Date"
+                value={endDate}
+                onChange={(date: Date | null) => setEndDate(date)}
+                slotProps={{ textField: { error: Boolean(errors.endDate), helperText: errors.endDate } }}
+              />
+            </Box>
+          </LocalizationProvider>
+        </Box>
+        <Box className='form-group'>
           <ImageDropZone />
-        </div>
-        <button className='hac-btn' type="submit">Post</button>
-      </form>
-    </div>
+        </Box>
+        <Button variant="contained" color="primary" type="submit" className="hac-btn" fullWidth>
+          Post
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

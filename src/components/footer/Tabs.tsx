@@ -9,7 +9,7 @@ import App from "../../App";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { CiViewList } from "react-icons/ci";
 import HackathonList from "../hackathonList/HackathonList";
-import AddHackathon from "../addPost/AddHackathon";
+import AddHackathon from "../addHackathon/AddHackathon";
 import { ImageDropZone } from "../imgaeDropZone/ImageDropZone";
 
 export type HackathonTab = RouteObject & {

@@ -1,0 +1,5 @@
+.login-container {
+    background-color: white;
+    display: grid;
+    gap: 15px;
+}
