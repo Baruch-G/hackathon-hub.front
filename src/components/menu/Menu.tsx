@@ -28,7 +28,7 @@ interface MenuProps {
     onClose: () => void
 }
 
-export default function Menu() {
+export default function Menu(props: MenuProps) {
     const [loginOpen, setLoginOpen] = useState(false);
     return (
         <Box sx={{ width: 320, maxWidth: '100%' }}>
@@ -55,7 +55,7 @@ export default function Menu() {
                     <div className='close-popup-btn'>
                         <IoCloseSharp size={30} onClick={() => setLoginOpen(false)} />
                     </div>
-                    <Login />
+                    <Login onConfirm={() => { setLoginOpen(false); props.onClose() }} />
                 </Box>
             </Modal>
         </Box>

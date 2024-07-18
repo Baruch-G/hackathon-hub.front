@@ -8,9 +8,19 @@ interface AddUserDto {
   password: string;
 }
 
+interface LoginDto {
+  email: string;
+  password: string;
+}
+
 export const registerUser = async (training: AddUserDto) => {
-  await POST("auth/register", training);
-//   fetchTrainig();
+  return await POST("auth/register", training);
+  //   fetchTrainig();
+};
+
+export const login = async (training: LoginDto) => {
+  return await POST("auth/login", training);
+  //   fetchTrainig();
 };
 
 // export const fetchAreas = async () => {

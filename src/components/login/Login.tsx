@@ -1,7 +1,8 @@
 import { Button, FormControl, TextField } from "@mui/material";
 import { useState } from "react";
 import "./Login.css";
-import { registerUser } from "../../api/DataFetch";
+import { login } from "../../api/DataFetch";
+import useUserStore from "../../state/UserStore";
 
 interface PostUser {
     firstName: string;
@@ -11,7 +12,11 @@ interface PostUser {
     img: string;
 }
 
-const Login = () => {
+interface LoginProps {
+    onConfirm: () => void
+}
+
+const Login = (props: LoginProps) => {
     const [userValues, setUserValues] = useState<PostUser>({
         firstName: "",
         lastName: "",
@@ -20,6 +25,7 @@ const Login = () => {
         phoneNumber: "",
     });
     const [errors, setErrors] = useState<Partial<PostUser>>({});
+    const setUser = useUserStore(store => store.setUser);
 
     const handlePhoneNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (/^\d*$/.test(event.target.value)) {
@@ -51,17 +57,21 @@ const Login = () => {
 
     const handleSubmit = () => {
         if (validate()) {
-            console.log("Form is valid, submit the data");
-
-            registerUser({
+            login({
                 email: userValues.email,
-                firstName: userValues.firstName,
-                lastName: userValues.lastName,
-                password: ":dfsgsdfgsdgsdgsdfgsdfgsdfgs"
+                password: "aaaBBB"
+            }).then(res => {
+                if (res?.data?.user) {
+                    setUser({
+                        firstName: res.data.user.firstName,
+                        lastName: res.data.user.lastName,
+                        email: res.data.user.email
+                    })
+                    props.onConfirm();
+                }
+            }).catch(e => {
+                console.log(e?.response?.data);
             })
-
-
-            // Submit the data
         }
     };
 

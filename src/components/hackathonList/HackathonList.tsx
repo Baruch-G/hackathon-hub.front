@@ -1,17 +1,12 @@
 import { useState, useEffect } from 'react';
 import './HackathonList.css';
-import { FaAngleDown, FaAngleUp, FaComment, FaRegCommentDots, FaRegEdit } from 'react-icons/fa';
+import { FaRegCommentDots } from 'react-icons/fa';
 import CommentForm from '../commentForm/CommentForm';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
-import { SlLike } from "react-icons/sl";
 import { FaRegComment } from "react-icons/fa6";
-import { FiEdit } from "react-icons/fi";
 import { Divider } from '@mui/material';
-import { GoHeart } from "react-icons/go";
-import { TiHeartOutline } from "react-icons/ti";
 import { FaRegHeart } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa";
-import { CiEdit } from 'react-icons/ci';
 
 interface User {
     img: string;
