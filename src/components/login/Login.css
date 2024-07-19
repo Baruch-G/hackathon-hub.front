@@ -3,3 +3,12 @@
     display: grid;
     gap: 15px;
 }
+
+.register-now {
+    cursor: pointer;
+    color: #054475;
+}
+
+.no-account{
+    justify-self: center;
+}

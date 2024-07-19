@@ -2,8 +2,8 @@ import { useState } from "react";
 import "./CommentForm.css"
 
 interface CommentFormProps {
-    hackathonId: number;
-    onAddComment: (id: number, comment: string) => void;
+    hackathonId: string;
+    onAddComment: (id: string, comment: string) => void;
   }
   
   const CommentForm: React.FC<CommentFormProps> = ({ hackathonId, onAddComment }) => {

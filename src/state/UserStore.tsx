@@ -1,8 +1,11 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
+import zukeeper from "zukeeper"
+
 
 //TODO: extracr type
 interface User {
+    _id: string;
     email: string,
     firstName: string,
     lastName: string,
@@ -11,15 +14,17 @@ interface User {
 interface UserState {
     user: User | undefined
     setUser: (user: User) => void
+    signOut: () => void
 }
 
 const useUserStore = create<UserState>()(
     devtools(
         persist(
-            (set) => ({
+            zukeeper((set: any) => ({
                 user: undefined,
-                setUser: (user: User) => set((state) => ({ user: user })),
-            }),
+                setUser: (user: User) => set((state: any) => ({ user: user })),
+                signOut: () => set((state: any) => ({ user: undefined }))
+            })),
             {
                 name: 'user-storage',
             },

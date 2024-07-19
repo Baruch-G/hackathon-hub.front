@@ -1,55 +1,44 @@
-import { Button, FormControl, TextField } from "@mui/material";
+import { Button, FormControl, TextField, InputAdornment, IconButton, Typography } from "@mui/material";
 import { useState } from "react";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import "./Login.css";
 import { login } from "../../api/DataFetch";
 import useUserStore from "../../state/UserStore";
 
 interface PostUser {
-    firstName: string;
-    lastName: string;
     email: string;
-    phoneNumber: string;
-    img: string;
+    password: string;
 }
 
 interface LoginProps {
     onConfirm: () => void
+    onRegisterClicked: () => void
 }
 
 const Login = (props: LoginProps) => {
     const [userValues, setUserValues] = useState<PostUser>({
-        firstName: "",
-        lastName: "",
         email: "",
-        img: "",
-        phoneNumber: "",
+        password: "",
     });
     const [errors, setErrors] = useState<Partial<PostUser>>({});
+    const [showPassword, setShowPassword] = useState(false);
+    const [apiError, setApiError] = useState<string | null>(null);
     const setUser = useUserStore(store => store.setUser);
 
-    const handlePhoneNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (/^\d*$/.test(event.target.value)) {
-            setUserValues({ ...userValues, phoneNumber: event.target.value });
-        }
+    const handlePasswordVisibility = () => {
+        setShowPassword(!showPassword);
     };
 
     const validate = () => {
         const newErrors: Partial<PostUser> = {};
-        if (!userValues.firstName.trim()) {
-            newErrors.firstName = "First name is required";
-        }
-        if (!userValues.lastName.trim()) {
-            newErrors.lastName = "Last name is required";
-        }
         if (!userValues.email.trim()) {
             newErrors.email = "Email is required";
         } else if (!/\S+@\S+\.\S+/.test(userValues.email)) {
             newErrors.email = "Email is not valid";
         }
-        if (!userValues.phoneNumber.trim()) {
-            newErrors.phoneNumber = "Phone number is required";
-        } else if (!/^\d{10}$/.test(userValues.phoneNumber)) {
-            newErrors.phoneNumber = "Phone number must be 10 digits";
+        if (!userValues.password.trim()) {
+            newErrors.password = "Password is required";
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -59,18 +48,19 @@ const Login = (props: LoginProps) => {
         if (validate()) {
             login({
                 email: userValues.email,
-                password: "aaaBBB"
+                password: userValues.password
             }).then(res => {
                 if (res?.data?.user) {
                     setUser({
                         firstName: res.data.user.firstName,
                         lastName: res.data.user.lastName,
-                        email: res.data.user.email
+                        email: res.data.user.email,
+                        _id: res.data.user._id
                     })
                     props.onConfirm();
                 }
             }).catch(e => {
-                console.log(e?.response?.data);
+                setApiError(e?.response?.data || "An error occurred. Please try again.");
             })
         }
     };
@@ -78,32 +68,6 @@ const Login = (props: LoginProps) => {
     return (
         <div className="login-container">
             <h2>Sign In:</h2>
-            <FormControl fullWidth>
-                <TextField
-                    label="First name"
-                    value={userValues.firstName}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setUserValues({ ...userValues, firstName: e.target.value })
-                    }
-                    error={Boolean(errors.firstName)}
-                    helperText={errors.firstName}
-                    variant="outlined"
-                />
-            </FormControl>
-
-            <FormControl fullWidth>
-                <TextField
-                    label="Last name"
-                    value={userValues.lastName}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setUserValues({ ...userValues, lastName: e.target.value })
-                    }
-                    error={Boolean(errors.lastName)}
-                    helperText={errors.lastName}
-                    variant="outlined"
-                />
-            </FormControl>
-
             <FormControl fullWidth>
                 <TextField
                     label="Email"
@@ -117,21 +81,43 @@ const Login = (props: LoginProps) => {
                     variant="outlined"
                 />
             </FormControl>
-
+            
             <FormControl fullWidth>
                 <TextField
-                    label="Phone"
+                    label="Password"
+                    type={showPassword ? "text" : "password"}
+                    value={userValues.password}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setUserValues({ ...userValues, password: e.target.value })
+                    }
+                    error={Boolean(errors.password)}
+                    helperText={errors.password}
                     variant="outlined"
-                    value={userValues.phoneNumber}
-                    inputProps={{ maxLength: 10 }}
-                    onChange={handlePhoneNumberChange}
-                    error={Boolean(errors.phoneNumber)}
-                    helperText={errors.phoneNumber}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handlePasswordVisibility}
+                                    edge="end"
+                                >
+                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                            </InputAdornment>
+                        )
+                    }}
                 />
             </FormControl>
+            {apiError && (
+                <Typography color="error" variant="body2">
+                    {apiError}
+                </Typography>
+            )}
             <Button fullWidth variant="contained" onClick={handleSubmit}>
                 Continue
             </Button>
+
+            <p className="no-account">Dont have ab account ? <a onClick={props.onRegisterClicked} className="register-now">Register now</a></p>
         </div>
     );
 };

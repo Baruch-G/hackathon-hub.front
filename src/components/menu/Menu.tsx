@@ -9,7 +9,8 @@ import { Box, Modal } from '@mui/material';
 import Login from '../login/Login';
 import { IoCloseSharp } from 'react-icons/io5';
 import "./Menu.css"
-// import zIndex from '@mui/material/styles/zIndex';
+import useUserStore from '../../state/UserStore';
+import Register from '../register/Register';
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -30,14 +31,24 @@ interface MenuProps {
 
 export default function Menu(props: MenuProps) {
     const [loginOpen, setLoginOpen] = useState(false);
+    const [loginDisplay, setLoginDisplay] = useState(true);
+    const user = useUserStore(store => store.user);
+    const signOut = useUserStore(store => store.signOut);
+
+    const onSignOutClicked = () => {
+        signOut();
+        props.onClose()
+        setLoginDisplay(true)
+    }
+
     return (
         <Box sx={{ width: 320, maxWidth: '100%' }}>
             <MenuList>
-                <MenuItem onClick={() => setLoginOpen(true)}>
+                <MenuItem onClick={() => user ? onSignOutClicked() : setLoginOpen(true)}>
                     <ListItemIcon>
                         <FaUserAlt fontSize="18" />
                     </ListItemIcon>
-                    <ListItemText>Sign In</ListItemText>
+                    <ListItemText>{user ? "Sign Out" : "Sign In"}</ListItemText>
                 </MenuItem>
                 <MenuItem>
                     <ListItemIcon>
@@ -55,7 +66,11 @@ export default function Menu(props: MenuProps) {
                     <div className='close-popup-btn'>
                         <IoCloseSharp size={30} onClick={() => setLoginOpen(false)} />
                     </div>
-                    <Login onConfirm={() => { setLoginOpen(false); props.onClose() }} />
+                    {
+                        loginDisplay ?
+                            <Login onRegisterClicked={() => setLoginDisplay(false)} onConfirm={() => { setLoginOpen(false); props.onClose() }} /> :
+                            <Register onLoginClicked={() => setLoginDisplay(true)} onConfirm={() => { setLoginOpen(false); props.onClose() }} />
+                    }
                 </Box>
             </Modal>
         </Box>

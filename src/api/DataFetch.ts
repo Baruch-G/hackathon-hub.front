@@ -23,15 +23,17 @@ export const login = async (training: LoginDto) => {
   //   fetchTrainig();
 };
 
+export const getHackathons = async () => {
+  const res = (await GET("hackathon")).data;
+  //  store.dispatch(setTrainingList(res));
+  return res;
+};
+
 // export const fetchAreas = async () => {
 //   return (await GET("areas")).data;
 // };
 
-// export const fetchTrainig = async () => {
-//   const res = (await GET("training")).data;
-//   store.dispatch(setTrainingList(res));
-//   return res;
-// };
+
 
 // export const fetchSquadrons = async () => {
 //   const res = (await GET("squadrons")).data;

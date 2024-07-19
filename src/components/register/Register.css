@@ -1,0 +1,14 @@
+.register-container {
+  display: grid;
+  gap: 15px;
+  background-color: white;
+}
+
+.have-an-account {
+  justify-self: center;
+}
+
+.login-now {
+  cursor: pointer;
+  color: #054475;
+}

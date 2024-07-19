@@ -24,6 +24,7 @@
     "react-icons": "^5.2.1",
     "react-router-dom": "^6.24.1",
     "styled-components": "^6.1.11",
+    "zukeeper": "^1.0.2",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
