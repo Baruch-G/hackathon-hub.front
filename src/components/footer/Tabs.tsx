@@ -25,7 +25,7 @@ export const tabs = [
             {
                 icon: IoAddCircleSharp,
                 path: "/hackathon/add",
-                element: <AddHackathon onSubmit={() => {}} />,
+                element: <AddHackathon />,
                 title: "add hackathon"
             },
             {

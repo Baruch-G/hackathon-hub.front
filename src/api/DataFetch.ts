@@ -1,4 +1,5 @@
 // import store from "../state/store";
+import { Comment } from "../components/hackathonList/HackathonList";
 import { DELETE, GET, POST } from "./Axios";
 
 interface AddUserDto {
@@ -29,11 +30,37 @@ export const getHackathons = async () => {
   return res;
 };
 
+export const likeHackathon = async (hackathonId: string, userId: string) => {
+  return await POST(`hackathon/${hackathonId}/like`, { userId });
+};
+
+export const addComment = async (
+  hackathonId: string,
+  userId: string,
+  text: string
+) => {
+  return await POST(`hackathon/${hackathonId}/comment`, { userId, text });
+};
+
+interface AddHackathonDto {
+  creator: string;
+  location: { lon: number; lat: number };
+  startDate: Date;
+  endDate: Date;
+  description: string;
+  comments: Comment[];
+  imgs: string[];
+  likes: string[];
+  dateCreated: Date;
+}
+
+export const addHackathon = async (hackathon: AddHackathonDto) => {
+  return await POST(`hackathon`, hackathon);
+};
+
 // export const fetchAreas = async () => {
 //   return (await GET("areas")).data;
 // };
-
-
 
 // export const fetchSquadrons = async () => {
 //   const res = (await GET("squadrons")).data;

@@ -25,10 +25,12 @@ function App() {
         <div className={`burger ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <IoCloseSharp size={30} /> : <MdOutlineNotes size={30} />}
         </div>
-        <div className='top-profile'>
-          <div>{user?.firstName}</div>
-          <img src={"https://picsum.photos/200/300?random=3"} alt={`name`} className="top-profile-img" />
-        </div>
+        {
+          user && <div className='top-profile'>
+            <div>{user?.firstName}</div>
+            <img src={"https://picsum.photos/200/300?random=3"} alt={`name`} className="top-profile-img" />
+          </div>
+        }
         <Logo />
         <SideDrawer open={menuOpen} children={<Menu onClose={() => setMenuOpen(false)} />} />
       </div>

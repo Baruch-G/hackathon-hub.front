@@ -5,17 +5,25 @@ import AdapterDateFns from '@mui/x-date-pickers/AdapterDateFns';
 import './AddHackathon.css';
 import { ImageDropZone } from '../imgaeDropZone/ImageDropZone';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { addHackathon } from '../../api/DataFetch';
+import useUserStore from '../../state/UserStore';
+import useHackathonStore from '../../state/HackathonStore';
+import { Snackbar } from '../snackbar/Snackbar';
+import { useNavigate } from 'react-router-dom';
 
 interface AddHackathonProps {
-  onSubmit: (post: { description: string, startDate: Date | null, endDate: Date | null, location: number | null }) => void;
 }
 
 const AddHackathon = (props: AddHackathonProps) => {
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackText, setSnackText] = useState('');
   const [description, setDescription] = useState<string>('');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [location, setLocation] = useState<number | null>(null);
   const [errors, setErrors] = useState<{ description?: string, startDate?: string, endDate?: string, location?: string }>({});
+  const user = useUserStore(store => store.user);
+  const addHackathonsToState = useHackathonStore(store => store.addHackathon);
 
   const validatePost = () => {
     let isValid = true;
@@ -49,14 +57,31 @@ const AddHackathon = (props: AddHackathonProps) => {
   };
 
   const handleSubmit = (e: React.FormEvent) => {
+    if (!user?._id) return // err msg
     e.preventDefault();
     if (validatePost()) {
-      props.onSubmit({ description, startDate, endDate, location });
-      setDescription('');
-      setStartDate(null);
-      setEndDate(null);
-      setLocation(null);
-      setErrors({});
+      addHackathon({
+        comments: [],
+        creator: user?._id,
+        dateCreated: new Date(Date.now()),
+        description: description,
+        endDate: new Date(Date.now()),
+        imgs: [],
+        likes: [],
+        location: { lat: 32, lon: 31 },
+        startDate: new Date(Date.now())
+      }).then(res => {
+        addHackathonsToState(res?.data)
+        setDescription('');
+        setStartDate(null);
+        setEndDate(null);
+        setLocation(null);
+        setErrors({});
+        setSnackOpen(true)
+        setSnackText("Hackathon added successfully")
+      }).catch(err => {
+        console.error(err)
+      })
     }
   };
 
@@ -114,6 +139,11 @@ const AddHackathon = (props: AddHackathonProps) => {
           Post
         </Button>
       </Box>
+
+      <Snackbar open={snackOpen} onClose={() => {
+        setSnackOpen(false)
+        setSnackText('')
+      }} text={snackText} />
     </Box>
   );
 };
