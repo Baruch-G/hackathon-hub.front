@@ -1,11 +1,12 @@
 import { Button, FormControl, TextField, InputAdornment, IconButton, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import "./Register.css";
 import { registerUser as register, login } from "../../api/DataFetch";
 import useUserStore from "../../state/UserStore";
 import axios from "axios";
+import useSnackbarStore from "../../state/SnackbarStore";
 
 interface PostUser {
     firstName: string;
@@ -18,6 +19,7 @@ interface PostUser {
 }
 
 interface RegisterProps {
+    editMode?: boolean
     onConfirm: () => void
     onLoginClicked: () => void
 }
@@ -38,6 +40,24 @@ const Register = (props: RegisterProps) => {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const setUser = useUserStore(store => store.setUser);
+    const user = useUserStore(store => store.user);
+    const { opanStackbar } = useSnackbarStore(store => store);
+
+    useEffect(() => {
+        if (props.editMode && user) {
+            setUserValues({
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phoneNumber: "0504599090",
+                password: '',
+                confirmPassword: '',
+                email: user.email,
+                img: user.imgUrl
+            })
+
+            setPreview(user.imgUrl)
+        }
+    }, [])
 
     const handlePhoneNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (/^\d*$/.test(event.target.value)) {
@@ -59,6 +79,7 @@ const Register = (props: RegisterProps) => {
 
     const validate = () => {
         const newErrors: Partial<PostUser> = {};
+        const passwordValidateRequaried = !props.editMode;
         if (!userValues.firstName.trim()) {
             newErrors.firstName = "First name is required";
         }
@@ -75,21 +96,21 @@ const Register = (props: RegisterProps) => {
         } else if (!/^\d{10}$/.test(userValues.phoneNumber)) {
             newErrors.phoneNumber = "Phone number must be 10 digits";
         }
-        if (!userValues.password.trim()) {
+        if (passwordValidateRequaried && !userValues.password.trim()) {
             newErrors.password = "Password is required";
         }
-        if (!userValues.confirmPassword.trim()) {
+        if (passwordValidateRequaried && !userValues.confirmPassword.trim()) {
             newErrors.confirmPassword = "Confirm password is required";
-        } else if (userValues.password !== userValues.confirmPassword) {
+        } else if (passwordValidateRequaried && userValues.password !== userValues.confirmPassword) {
             newErrors.confirmPassword = "Passwords do not match";
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
+
     const handleSubmit = async () => {
         if (validate()) {
-
             let profileImgUrl = '';
             if (selectedImage) {
                 const formData = new FormData();
@@ -100,45 +121,118 @@ const Register = (props: RegisterProps) => {
                     }
                 });
 
-                profileImgUrl = uploadResponse.data?.urls[0] ?? ''
+                profileImgUrl = uploadResponse.data?.urls[0] ?? '';
             }
 
-            register({
+            const userPayload = {
                 firstName: userValues.firstName,
                 lastName: userValues.lastName,
                 email: userValues.email,
-                imgUrl: profileImgUrl.replace('\\', '//'),
-                // phoneNumber: userValues.phoneNumber,
+                imgUrl: profileImgUrl.length !== 0 ? profileImgUrl.replace('\\', '//') : (preview ? preview : 'https://i.sstatic.net/l60Hf.png'),
+                phoneNumber: userValues.phoneNumber,
                 password: userValues.password
-            }).then(res => {
-                login({
-                    email: userValues.email,
-                    password: userValues.password
-                }).then(res => {
-                    if (res?.data?.user) {
+            };
+
+            if (props.editMode && user) {
+                // Update user API call
+                try {
+                    const response = await axios.put(`http://localhost:6969/auth/users/${user._id}`, userPayload);
+
+                    if (response?.data) {
                         setUser({
-                            firstName: res.data.user.firstName,
-                            lastName: res.data.user.lastName,
-                            email: res.data.user.email,
-                            _id: res.data.user._id,
-                            imgUrl: res.data.user.imgUrl
-                        })
+                            firstName: response.data.firstName,
+                            lastName: response.data.lastName,
+                            email: response.data.email,
+                            _id: response.data._id,
+                            imgUrl: response.data.imgUrl
+                        });
                         props.onConfirm();
                     }
-                }).catch(e => {
-                    setApiError(e?.response?.data?.message || "An error occurred during login. Please try again.");
-                });
-            }).catch(e => {
-                setApiError(e?.response?.data.message || "An error occurred during registration. Please try again.");
-            });
+                    props.onConfirm();
+                    opanStackbar('Account updated successfully', 'success')
+                    setApiError('')
+                } catch (e: any) {
+                    setApiError(e?.response?.data?.message || "An error occurred during update. Please try again.");
+                }
+            } else {
+                // Register user API call
+                try {
+                    await register(userPayload);
+                    const loginResponse = await login({
+                        email: userValues.email,
+                        password: userValues.password
+                    });
+                    if (loginResponse?.data?.user) {
+                        setUser({
+                            firstName: loginResponse.data.user.firstName,
+                            lastName: loginResponse.data.user.lastName,
+                            email: loginResponse.data.user.email,
+                            _id: loginResponse.data.user._id,
+                            imgUrl: loginResponse.data.user.imgUrl
+                        });
+                        props.onConfirm();
+                    }
+                    opanStackbar('User crteated successfully', 'success')
+                    setApiError('')
+                } catch (e: any) {
+                    setApiError(e?.response?.data?.message || "An error occurred during registration. Please try again.");
+                }
+            }
         }
     };
+
+
+    // const handleSubmit = async () => {
+    //     if (validate()) {
+    //         let profileImgUrl = '';
+    //         if (selectedImage) {
+    //             const formData = new FormData();
+    //             formData.append('file', selectedImage);
+    //             const uploadResponse = await axios.post('http://localhost:6969/file', formData, {
+    //                 headers: {
+    //                     'Content-Type': 'multipart/form-data'
+    //                 }
+    //             });
+
+    //             profileImgUrl = uploadResponse.data?.urls[0] ?? ''
+    //         }
+
+    //         register({
+    //             firstName: userValues.firstName,
+    //             lastName: userValues.lastName,
+    //             email: userValues.email,
+    //             imgUrl: profileImgUrl.replace('\\', '//'),
+    //             // phoneNumber: userValues.phoneNumber,
+    //             password: userValues.password
+    //         }).then(res => {
+    //             login({
+    //                 email: userValues.email,
+    //                 password: userValues.password
+    //             }).then(res => {
+    //                 if (res?.data?.user) {
+    //                     setUser({
+    //                         firstName: res.data.user.firstName,
+    //                         lastName: res.data.user.lastName,
+    //                         email: res.data.user.email,
+    //                         _id: res.data.user._id,
+    //                         imgUrl: res.data.user.imgUrl
+    //                     })
+    //                     props.onConfirm();
+    //                 }
+    //             }).catch(e => {
+    //                 setApiError(e?.response?.data?.message || "An error occurred during login. Please try again.");
+    //             });
+    //         }).catch(e => {
+    //             setApiError(e?.response?.data.message || "An error occurred during registration. Please try again.");
+    //         });
+    //     }
+    // };
 
     return (
         <div className="registration-wrapper">
 
             <div className="register-container">
-                <h2>Register:</h2>
+                <h2>{props.editMode && user ? 'Update account' : 'Register:'}</h2>
                 {apiError && (
                     <Typography color="error" variant="body2">
                         {apiError}
@@ -173,6 +267,7 @@ const Register = (props: RegisterProps) => {
                 <FormControl fullWidth>
                     <TextField
                         label="Email"
+                        disabled={props.editMode && !!user}
                         type="email"
                         value={userValues.email}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -196,63 +291,71 @@ const Register = (props: RegisterProps) => {
                     />
                 </FormControl>
 
-                <FormControl fullWidth>
-                    <TextField
-                        label="Password"
-                        type={showPassword ? "text" : "password"}
-                        value={userValues.password}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setUserValues({ ...userValues, password: e.target.value })
-                        }
-                        error={Boolean(errors.password)}
-                        helperText={errors.password}
-                        variant="outlined"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handlePasswordVisibility}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            )
-                        }}
-                    />
-                </FormControl>
+                {
+                    !props.editMode && <>
 
-                <FormControl fullWidth>
-                    <TextField
-                        label="Confirm Password"
-                        type={showPassword ? "text" : "password"}
-                        value={userValues.confirmPassword}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setUserValues({ ...userValues, confirmPassword: e.target.value })
-                        }
-                        error={Boolean(errors.confirmPassword)}
-                        helperText={errors.confirmPassword}
-                        variant="outlined"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handlePasswordVisibility}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            )
-                        }}
-                    />
-                </FormControl>
+                        <FormControl fullWidth>
+                            <TextField
+                                label="Password"
+                                type={showPassword ? "text" : "password"}
+                                value={userValues.password}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    setUserValues({ ...userValues, password: e.target.value })
+                                }
+                                error={Boolean(errors.password)}
+                                helperText={errors.password}
+                                variant="outlined"
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handlePasswordVisibility}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
+                        </FormControl>
+
+                        <FormControl fullWidth>
+                            <TextField
+                                label="Confirm Password"
+                                type={showPassword ? "text" : "password"}
+                                value={userValues.confirmPassword}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    setUserValues({ ...userValues, confirmPassword: e.target.value })
+                                }
+                                error={Boolean(errors.confirmPassword)}
+                                helperText={errors.confirmPassword}
+                                variant="outlined"
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handlePasswordVisibility}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
+                        </FormControl>
+                    </>
+                }
+
                 <Button variant="contained" fullWidth onClick={handleSubmit}>
-                    Register
+                    {props.editMode && user ? 'Update details' : 'Register'}
                 </Button>
-                <p className="have-an-account">Already have an account ? <a onClick={props.onLoginClicked} className="login-now">Login now</a></p>
+                {
+                    !props.editMode && !user && <p className="have-an-account">Already have an account ? <a onClick={props.onLoginClicked} className="login-now">Login now</a></p>
+                }
             </div>
 
             <div className="upload-container">

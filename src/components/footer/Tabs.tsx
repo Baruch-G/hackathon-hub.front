@@ -6,6 +6,7 @@ import { IoAddCircleSharp } from "react-icons/io5";
 import { CiViewList } from "react-icons/ci";
 import HackathonList from "../hackathonList/HackathonList";
 import AddHackathon from "../addHackathon/AddHackathon";
+import { PiUserListThin } from "react-icons/pi";
 import App from "../../App";
 
 export type HackathonTab = RouteObject & {
@@ -36,10 +37,10 @@ export const tabs = [
                 title: "Edit Hackathon"
             },
             {
-                icon: BsMap,
-                path: "/hackathon/map",
-                element: < div />,
-                title: "hackathon map"
+                icon: PiUserListThin,
+                path: "/hackathon/personal-view",
+                element: <HackathonList personal />,
+                title: "view personal map"
             }
         ]
     }

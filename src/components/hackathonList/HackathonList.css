@@ -17,6 +17,13 @@
 
 .hackathon-header {
   display: grid;
+  gap: 15px;
+}
+
+.location-details-container {
+  display: grid;
+  gap: 10px;
+  color: var(--lp-tabs-unselected, #6b778c);;
 }
 
 .hackthon-poster-profile,

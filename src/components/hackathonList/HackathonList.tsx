@@ -4,7 +4,7 @@ import { FaRegCommentDots } from 'react-icons/fa';
 import CommentForm from '../commentForm/CommentForm';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
 import { FaDeleteLeft, FaRegComment } from "react-icons/fa6";
-import { Dialog, Divider, ImageList, ImageListItem, Modal } from '@mui/material';
+import { Dialog, Divider, ImageList, ImageListItem, imageListItemBarClasses, Modal } from '@mui/material';
 import { FaRegHeart } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa";
 import { addComment, deleteHackathon, getHackathons, likeHackathon } from '../../api/DataFetch';
@@ -53,7 +53,11 @@ const formatDateRange = (startDate: string, endDate: string): string => {
     return `${startFormatted} - ${endFormatted}`;
 };
 
-const HackathonList = () => {
+interface HackathonListProps {
+    personal?: boolean
+}
+
+const HackathonList = (props: HackathonListProps) => {
     const [showComments, setShowComments] = useState<boolean[]>([]);
     const user = useUserStore(store => store.user);
     const { hackathons, setHackathons, toggleLike, updateHackathon } = useHackathonStore(store => store);
@@ -70,7 +74,7 @@ const HackathonList = () => {
             console.error(e);
         })
 
-    }, []);
+    }, [user]);
 
     const handleLike = (id: string) => {
         if (!user?._id) return; // infor err via popup
@@ -108,7 +112,7 @@ const HackathonList = () => {
 
     return (
         <div className="hackathon-list">
-            {hackathons.map((hackathon, index) => (
+            {hackathons.filter(h => !props.personal || user?._id === h.creator._id).map((hackathon, index) => (
                 <div className="hackathon-item" key={hackathon._id}>
                     <div className="hackathon-header">
                         <div className='hackthon-poster-profile'>
@@ -127,15 +131,20 @@ const HackathonList = () => {
                                 </div>
                             }
                         </div>
-                        <div className='location-details'>
-                            <HiOutlineLocationMarker />
-                            <p>{hackathon.location}</p>
+                        <div className='location-details-container'>
+                            <div className='location-details'>
+                                <HiOutlineLocationMarker />
+                                <div>{hackathon.location}</div>
+                            </div>
+                            <div className='location-details'>
+                                <CiCalendarDate />
+                                <div>{formatDateRange(hackathon.startDate, hackathon.endDate)}</div>
+                            </div>
                         </div>
-                        <div className='location-details'>
-                            <CiCalendarDate  />
-                            <p>{formatDateRange(hackathon.startDate, hackathon.endDate)}</p>
-                        </div>
+
                     </div>
+
+
                     <div className="hackathon-details">
                         <p>{hackathon.description}</p>
                         <div>

@@ -10,7 +10,7 @@ interface SnackbarProps {
 
 export const Snackbar = (props: SnackbarProps) => {
     return (
-        <MuiSnackbar open={props.open} autoHideDuration={6000} onClose={props.onClose}>
+        <MuiSnackbar sx={{zIndex: 3000}} open={props.open} autoHideDuration={6000} onClose={props.onClose}>
             <Alert
                 onClose={props.onClose}
                 severity={props.severity}
