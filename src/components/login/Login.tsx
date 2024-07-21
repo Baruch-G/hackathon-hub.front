@@ -55,7 +55,8 @@ const Login = (props: LoginProps) => {
                         firstName: res.data.user.firstName,
                         lastName: res.data.user.lastName,
                         email: res.data.user.email,
-                        _id: res.data.user._id
+                        _id: res.data.user._id,
+                        imgUrl: res.data.user.imgUrl
                     })
                     props.onConfirm();
                 }
@@ -81,7 +82,7 @@ const Login = (props: LoginProps) => {
                     variant="outlined"
                 />
             </FormControl>
-            
+
             <FormControl fullWidth>
                 <TextField
                     label="Password"

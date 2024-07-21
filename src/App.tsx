@@ -10,10 +10,13 @@ import Menu from './components/menu/Menu';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
 import customTheme from './theme/Theme';
 import useUserStore from './state/UserStore';
+import { Snackbar } from './components/snackbar/Snackbar';
+import useSnackbarStore from './state/SnackbarStore';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const user = useUserStore(store => store.user);
+  const { snackData, closeStackbar } = useSnackbarStore(store => store);
 
   return (
     <ThemeProvider theme={customTheme(useTheme())}>
@@ -28,11 +31,12 @@ function App() {
         {
           user && <div className='top-profile'>
             <div>{user?.firstName}</div>
-            <img src={"https://picsum.photos/200/300?random=3"} alt={`name`} className="top-profile-img" />
+            <img src={user.imgUrl} alt={`name`} className="top-profile-img" />
           </div>
         }
         <Logo />
         <SideDrawer open={menuOpen} children={<Menu onClose={() => setMenuOpen(false)} />} />
+        <Snackbar severity={snackData.severity} open={snackData.open} onClose={closeStackbar} text={snackData.text} />
       </div>
     </ThemeProvider>
   )

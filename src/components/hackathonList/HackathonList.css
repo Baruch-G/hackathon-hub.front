@@ -49,11 +49,6 @@
   margin-bottom: 10px;
 }
 
-.hackathon-images img {
-  max-width: 100px;
-  margin-right: 5px;
-}
-
 .hackathon-actions {
   display: flex;
   gap: 20px;

@@ -28,8 +28,10 @@ const useHackathonStore = create<HackathonState>((set) => ({
     },
     addHackathon: (hackathon: Hackathon) => {
         set((state) => ({
-            hackathons: [...state.hackathons, hackathon]
-        }))
+            hackathons: state.hackathons.some(h => h._id === hackathon._id)
+                ? state.hackathons.map(h => h._id === hackathon._id ? hackathon : h)
+                : [...state.hackathons, hackathon]
+        }));
     },
     updateHackathon: (updatedHackathon: Hackathon) => {
         set((state) => ({

@@ -2,6 +2,7 @@
   display: grid;
   gap: 15px;
   background-color: white;
+  width: 70%;
 }
 
 .have-an-account {
@@ -11,4 +12,39 @@
 .login-now {
   cursor: pointer;
   color: #054475;
+}
+
+.profile-preview {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  margin-top: 10px;
+  border-radius: 50%;
+}
+
+.registration-wrapper {
+  display: flex;
+  gap: 50px;
+}
+
+.upload-container {
+    /* background-color: aquamarine; */
+    border: #054475 solid 1px;
+    border-radius: 1px;
+    padding: 5px;
+    height: 280px;
+    align-self: center;
+    display: grid;
+    justify-items: center;
+    align-items: end;
+}
+
+@media (max-width: 480px) {
+  .registration-wrapper {
+    display: block;
+  }
+
+  .register-container {
+    width: unset;
+  }
 }

@@ -1,19 +1,15 @@
 
-import { GiTank } from "react-icons/gi";
-import { AiOutlineUser } from "react-icons/ai";
-import { HiInformationCircle } from "react-icons/hi";
-import { BsAirplaneEnginesFill, BsMap } from "react-icons/bs";
+import {  BsMap } from "react-icons/bs";
 import { RouteObject } from "react-router-dom";
-import { ElementType, ReactNode } from "react";
-import App from "../../App";
+import { ElementType } from "react";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { CiViewList } from "react-icons/ci";
 import HackathonList from "../hackathonList/HackathonList";
 import AddHackathon from "../addHackathon/AddHackathon";
-import { ImageDropZone } from "../imgaeDropZone/ImageDropZone";
+import App from "../../App";
 
 export type HackathonTab = RouteObject & {
-    icon: ElementType,
+    icon?: ElementType,
     title: string
 }
 
@@ -31,19 +27,18 @@ export const tabs = [
             {
                 icon: CiViewList,
                 path: "/hackathon/view",
-                element: <HackathonList/>,
+                element: <HackathonList />,
                 title: "view hackathon"
             },
             {
-                icon: BsAirplaneEnginesFill,
-                path: "/hackathon/edit",
-                element: <ImageDropZone />,
-                title: "edit hackathon"
+                path: "/hackathon/edit/:id",
+                element: <AddHackathon updateMode/>,
+                title: "Edit Hackathon"
             },
             {
                 icon: BsMap,
                 path: "/hackathon/map",
-                element: < div/>,
+                element: < div />,
                 title: "hackathon map"
             }
         ]

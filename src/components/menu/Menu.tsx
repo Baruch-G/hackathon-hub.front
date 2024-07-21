@@ -50,12 +50,12 @@ export default function Menu(props: MenuProps) {
                     </ListItemIcon>
                     <ListItemText>{user ? "Sign Out" : "Sign In"}</ListItemText>
                 </MenuItem>
-                <MenuItem>
+                {/* <MenuItem>
                     <ListItemIcon>
                         <FaUserShield fontSize="18" />
                     </ListItemIcon>
                     <ListItemText>Manage</ListItemText>
-                </MenuItem>
+                </MenuItem> */}
             </MenuList>
             <Modal
                 style={{ zIndex: 2001 }}

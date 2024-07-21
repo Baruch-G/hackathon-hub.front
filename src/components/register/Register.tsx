@@ -5,6 +5,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import "./Register.css";
 import { registerUser as register, login } from "../../api/DataFetch";
 import useUserStore from "../../state/UserStore";
+import axios from "axios";
 
 interface PostUser {
     firstName: string;
@@ -34,6 +35,8 @@ const Register = (props: RegisterProps) => {
     const [errors, setErrors] = useState<Partial<PostUser>>({});
     const [showPassword, setShowPassword] = useState(false);
     const [apiError, setApiError] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
     const setUser = useUserStore(store => store.setUser);
 
     const handlePhoneNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,6 +47,14 @@ const Register = (props: RegisterProps) => {
 
     const handlePasswordVisibility = () => {
         setShowPassword(!showPassword);
+    };
+
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setSelectedImage(file);
+            setPreview(URL.createObjectURL(file));
+        }
     };
 
     const validate = () => {
@@ -76,12 +87,27 @@ const Register = (props: RegisterProps) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validate()) {
+
+            let profileImgUrl = '';
+            if (selectedImage) {
+                const formData = new FormData();
+                formData.append('file', selectedImage);
+                const uploadResponse = await axios.post('http://localhost:6969/file', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                profileImgUrl = uploadResponse.data?.urls[0] ?? ''
+            }
+
             register({
                 firstName: userValues.firstName,
                 lastName: userValues.lastName,
                 email: userValues.email,
+                imgUrl: profileImgUrl.replace('\\', '//'),
                 // phoneNumber: userValues.phoneNumber,
                 password: userValues.password
             }).then(res => {
@@ -95,136 +121,164 @@ const Register = (props: RegisterProps) => {
                             lastName: res.data.user.lastName,
                             email: res.data.user.email,
                             _id: res.data.user._id,
+                            imgUrl: res.data.user.imgUrl
                         })
                         props.onConfirm();
                     }
                 }).catch(e => {
-                    setApiError(e?.response?.data || "An error occurred during login. Please try again.");
+                    setApiError(e?.response?.data?.message || "An error occurred during login. Please try again.");
                 });
             }).catch(e => {
-                setApiError(e?.response?.data || "An error occurred during registration. Please try again.");
+                setApiError(e?.response?.data.message || "An error occurred during registration. Please try again.");
             });
         }
     };
 
     return (
-        <div className="register-container">
-            <h2>Register:</h2>
-            {apiError && (
-                <Typography color="error" variant="body2">
-                    {apiError}
-                </Typography>
-            )}
-            <FormControl fullWidth>
-                <TextField
-                    label="First name"
-                    value={userValues.firstName}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setUserValues({ ...userValues, firstName: e.target.value })
-                    }
-                    error={Boolean(errors.firstName)}
-                    helperText={errors.firstName}
-                    variant="outlined"
-                />
-            </FormControl>
+        <div className="registration-wrapper">
 
-            <FormControl fullWidth>
-                <TextField
-                    label="Last name"
-                    value={userValues.lastName}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setUserValues({ ...userValues, lastName: e.target.value })
-                    }
-                    error={Boolean(errors.lastName)}
-                    helperText={errors.lastName}
-                    variant="outlined"
-                />
-            </FormControl>
+            <div className="register-container">
+                <h2>Register:</h2>
+                {apiError && (
+                    <Typography color="error" variant="body2">
+                        {apiError}
+                    </Typography>
+                )}
+                <FormControl fullWidth>
+                    <TextField
+                        label="First name"
+                        value={userValues.firstName}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setUserValues({ ...userValues, firstName: e.target.value })
+                        }
+                        error={Boolean(errors.firstName)}
+                        helperText={errors.firstName}
+                        variant="outlined"
+                    />
+                </FormControl>
 
-            <FormControl fullWidth>
-                <TextField
-                    label="Email"
-                    type="email"
-                    value={userValues.email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setUserValues({ ...userValues, email: e.target.value })
-                    }
-                    error={Boolean(errors.email)}
-                    helperText={errors.email}
-                    variant="outlined"
-                />
-            </FormControl>
+                <FormControl fullWidth>
+                    <TextField
+                        label="Last name"
+                        value={userValues.lastName}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setUserValues({ ...userValues, lastName: e.target.value })
+                        }
+                        error={Boolean(errors.lastName)}
+                        helperText={errors.lastName}
+                        variant="outlined"
+                    />
+                </FormControl>
 
-            <FormControl fullWidth>
-                <TextField
-                    label="Phone"
-                    variant="outlined"
-                    value={userValues.phoneNumber}
-                    inputProps={{ maxLength: 10 }}
-                    onChange={handlePhoneNumberChange}
-                    error={Boolean(errors.phoneNumber)}
-                    helperText={errors.phoneNumber}
-                />
-            </FormControl>
+                <FormControl fullWidth>
+                    <TextField
+                        label="Email"
+                        type="email"
+                        value={userValues.email}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setUserValues({ ...userValues, email: e.target.value })
+                        }
+                        error={Boolean(errors.email)}
+                        helperText={errors.email}
+                        variant="outlined"
+                    />
+                </FormControl>
 
-            <FormControl fullWidth>
-                <TextField
-                    label="Password"
-                    type={showPassword ? "text" : "password"}
-                    value={userValues.password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setUserValues({ ...userValues, password: e.target.value })
-                    }
-                    error={Boolean(errors.password)}
-                    helperText={errors.password}
-                    variant="outlined"
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <IconButton
-                                    aria-label="toggle password visibility"
-                                    onClick={handlePasswordVisibility}
-                                    edge="end"
-                                >
-                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        )
-                    }}
-                />
-            </FormControl>
+                <FormControl fullWidth>
+                    <TextField
+                        label="Phone"
+                        variant="outlined"
+                        value={userValues.phoneNumber}
+                        inputProps={{ maxLength: 10 }}
+                        onChange={handlePhoneNumberChange}
+                        error={Boolean(errors.phoneNumber)}
+                        helperText={errors.phoneNumber}
+                    />
+                </FormControl>
 
-            <FormControl fullWidth>
-                <TextField
-                    label="Confirm Password"
-                    type={showPassword ? "text" : "password"}
-                    value={userValues.confirmPassword}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setUserValues({ ...userValues, confirmPassword: e.target.value })
-                    }
-                    error={Boolean(errors.confirmPassword)}
-                    helperText={errors.confirmPassword}
-                    variant="outlined"
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <IconButton
-                                    aria-label="toggle password visibility"
-                                    onClick={handlePasswordVisibility}
-                                    edge="end"
-                                >
-                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        )
-                    }}
-                />
-            </FormControl>
+                <FormControl fullWidth>
+                    <TextField
+                        label="Password"
+                        type={showPassword ? "text" : "password"}
+                        value={userValues.password}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setUserValues({ ...userValues, password: e.target.value })
+                        }
+                        error={Boolean(errors.password)}
+                        helperText={errors.password}
+                        variant="outlined"
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handlePasswordVisibility}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            )
+                        }}
+                    />
+                </FormControl>
 
-            <Button variant="contained" fullWidth onClick={handleSubmit}>
-                Register
-            </Button>
-            <p className="have-an-account">Already have an account ? <a onClick={props.onLoginClicked} className="login-now">Login now</a></p>
+                <FormControl fullWidth>
+                    <TextField
+                        label="Confirm Password"
+                        type={showPassword ? "text" : "password"}
+                        value={userValues.confirmPassword}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setUserValues({ ...userValues, confirmPassword: e.target.value })
+                        }
+                        error={Boolean(errors.confirmPassword)}
+                        helperText={errors.confirmPassword}
+                        variant="outlined"
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handlePasswordVisibility}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            )
+                        }}
+                    />
+                </FormControl>
+                <Button variant="contained" fullWidth onClick={handleSubmit}>
+                    Register
+                </Button>
+                <p className="have-an-account">Already have an account ? <a onClick={props.onLoginClicked} className="login-now">Login now</a></p>
+            </div>
+
+            <div className="upload-container">
+                {preview ? (
+                    <img src={preview} alt="Profile Preview" className="profile-preview" />
+                ) : <img src={"/no_img.webp"} alt="No Profile" className="profile-preview" />}
+                <div>
+                    <Button
+                        variant="contained"
+                        component="label"
+                        sx={
+                            {
+                                fontSize: '0.7em'
+                            }
+                        }
+                    >
+                        Upload Profile Image
+                        <input
+                            type="file"
+                            hidden
+                            onChange={handleImageChange}
+                        />
+                    </Button>
+                </div>
+            </div>
+
         </div>
     );
 };

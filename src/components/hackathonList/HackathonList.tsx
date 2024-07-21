@@ -4,37 +4,36 @@ import { FaRegCommentDots } from 'react-icons/fa';
 import CommentForm from '../commentForm/CommentForm';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
 import { FaDeleteLeft, FaRegComment } from "react-icons/fa6";
-import { Divider } from '@mui/material';
+import { Dialog, Divider, ImageList, ImageListItem, Modal } from '@mui/material';
 import { FaRegHeart } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa";
-import { addComment, getHackathons, likeHackathon } from '../../api/DataFetch';
+import { addComment, deleteHackathon, getHackathons, likeHackathon } from '../../api/DataFetch';
 import useUserStore from '../../state/UserStore';
 import useHackathonStore from '../../state/HackathonStore';
-import { CiEdit } from 'react-icons/ci';
+import { CiCalendarDate, CiEdit } from 'react-icons/ci';
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { format } from 'date-fns';
+import { IoCalendarNumberOutline } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
     imgUrl: string;
     firstName: string;
     lastName: string;
-    email: string
-    _id: string
+    email: string;
+    _id: string;
 }
 
-interface Location {
-    lon: number,
-    lat: number,
-}
 export interface Comment {
     text: string;
     user: User;
-    _id: string
+    _id: string;
 }
 
 export interface Hackathon {
     _id: string;
     creator: User;
-    location: Location;
+    location: string;
     description: string;
     startDate: string;
     endDate: string;
@@ -44,11 +43,21 @@ export interface Hackathon {
     dateCreated: string;
 }
 
+const formatDateRange = (startDate: string, endDate: string): string => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const startFormatted = format(start, 'd MMM');
+    const endFormatted = format(end, 'd MMM yyyy');
+
+    return `${startFormatted} - ${endFormatted}`;
+};
+
 const HackathonList = () => {
-    // const [hackathons, setHackathons] = useState<Hackathon[]>([]);
     const [showComments, setShowComments] = useState<boolean[]>([]);
     const user = useUserStore(store => store.user);
     const { hackathons, setHackathons, toggleLike, updateHackathon } = useHackathonStore(store => store);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const initialShowComments = Array.from({ length: [].length }, () => false);
@@ -64,23 +73,26 @@ const HackathonList = () => {
     }, []);
 
     const handleLike = (id: string) => {
-        if (!user?._id) return // infor err via popup 
-        // fire and forget
-        toggleLike(id, user._id)
-        likeHackathon(id, user._id)
+        if (!user?._id) return; // infor err via popup
+        toggleLike(id, user._id);
+        likeHackathon(id, user._id);
     };
 
-    const handleEdit = (id: number) => {
-        console.log(`Edit hackathon with ID: ${id}`);
-    };
+    const renderHackathons = () => {
+        getHackathons().then(res => {
+            setHackathons(res);
+            console.log(res);
+        }).catch(e => {
+            console.error(e);
+        })
+    }
 
     const handleAddComment = (id: string, comment: string) => {
-        if (!user?._id) return // infor err via popup 
+        if (!user?._id) return; // infor err via popup 
         addComment(id, user._id, comment).then(res => {
             if (res?.data) {
                 console.log(hackathons);
-                updateHackathon(res.data)
-                updateHackathon(res.data)
+                updateHackathon(res.data);
                 console.log(hackathons);
             }
         })
@@ -102,26 +114,43 @@ const HackathonList = () => {
                         <div className='hackthon-poster-profile'>
                             <img src={hackathon.creator.imgUrl} alt={`${hackathon.creator.firstName} ${hackathon.creator.lastName}`} className="profile-img" />
                             <div className='hackathon-poster-name'>{hackathon.creator.firstName} {hackathon.creator.lastName}</div>
-
                             {
                                 user?._id === hackathon.creator._id && <div className='own-user-actions'>
-                                    <CiEdit className='icon-button' />
-                                    <RiDeleteBin6Line className='icon-button' />
+                                    <CiEdit onClick={() => {
+                                        navigate(`/hackathon/edit/${hackathon._id}`)
+                                    }} className='icon-button' />
+                                    <RiDeleteBin6Line onClick={() => {
+                                        deleteHackathon(hackathon._id).then(re => {
+                                            renderHackathons()
+                                        })
+                                    }} className='icon-button' />
                                 </div>
                             }
                         </div>
                         <div className='location-details'>
                             <HiOutlineLocationMarker />
-                            <p>{hackathon.location.lon}</p>
+                            <p>{hackathon.location}</p>
+                        </div>
+                        <div className='location-details'>
+                            <CiCalendarDate  />
+                            <p>{formatDateRange(hackathon.startDate, hackathon.endDate)}</p>
                         </div>
                     </div>
                     <div className="hackathon-details">
                         <p>{hackathon.description}</p>
-                        <p>{hackathon.startDate}</p>
-                        <div className="hackathon-images">
-                            {hackathon.imgs.map((img, idx) => (
-                                <img key={img} src={img} alt={`Hackathon ${idx + 1}`} />
-                            ))}
+                        <div>
+                            <ImageList sx={{ height: 250 }} cols={3} rowHeight={164}>
+                                {hackathon.imgs.map((img, idx) => (
+                                    <ImageListItem key={idx}>
+                                        <img
+                                            srcSet={`${img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                                            src={`${img}?w=164&h=164&fit=crop&auto=format`}
+                                            alt={img}
+                                            loading="lazy"
+                                        />
+                                    </ImageListItem>
+                                ))}
+                            </ImageList>
                         </div>
                     </div>
                     <div className="hackathon-actions">

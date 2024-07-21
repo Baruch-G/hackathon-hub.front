@@ -1,29 +1,50 @@
-import React, { useState } from 'react';
-import { TextField, Button, Box } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { TextField, Button, Box, ImageList, ImageListItem } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import AdapterDateFns from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 import './AddHackathon.css';
 import { ImageDropZone } from '../imgaeDropZone/ImageDropZone';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { addHackathon } from '../../api/DataFetch';
+import { addHackathon, AddHackathonDto, fetchHackathon, updateHackathon } from '../../api/DataFetch';
 import useUserStore from '../../state/UserStore';
 import useHackathonStore from '../../state/HackathonStore';
-import { Snackbar } from '../snackbar/Snackbar';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
+import useSnackbarStore from '../../state/SnackbarStore';
+import { Hackathon } from '../hackathonList/HackathonList';
 
 interface AddHackathonProps {
+  updateMode?: boolean
 }
 
 const AddHackathon = (props: AddHackathonProps) => {
-  const [snackOpen, setSnackOpen] = useState(false);
-  const [snackText, setSnackText] = useState('');
+  const { opanStackbar } = useSnackbarStore(store => store);
+  const { id } = useParams();
   const [description, setDescription] = useState<string>('');
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [location, setLocation] = useState<number | null>(null);
+  const [startDate, setStartDate] = useState<dayjs.Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null);
+  const [location, setLocation] = useState<string>('');
   const [errors, setErrors] = useState<{ description?: string, startDate?: string, endDate?: string, location?: string }>({});
+  const [files, setFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const user = useUserStore(store => store.user);
-  const addHackathonsToState = useHackathonStore(store => store.addHackathon);
+  const addHackathonsToState = useHackathonStore(store => store.addHackathon); // Modified here to use the new addOrUpdateHackathon method
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (id) {
+      fetchHackathon(id).then((hackathon: Hackathon) => {
+        setDescription(hackathon.description);
+        setStartDate(dayjs(hackathon.startDate));
+        setEndDate(dayjs(hackathon.endDate));
+        setLocation(hackathon.location);
+        setExistingImages(hackathon.imgs); // Set existing images
+      }).catch((error: any) => {
+        console.error(error);
+        opanStackbar('Failed to fetch hackathon details', 'error');
+      });
+    }
+  }, [id, opanStackbar]);
 
   const validatePost = () => {
     let isValid = true;
@@ -42,13 +63,13 @@ const AddHackathon = (props: AddHackathonProps) => {
     if (!endDate) {
       errors.endDate = 'End date is required';
       isValid = false;
-    } else if (startDate && endDate && startDate > endDate) {
+    } else if (startDate && endDate && startDate.isAfter(endDate)) {
       errors.endDate = 'End date should be after start date';
       isValid = false;
     }
 
-    if (location === null || location <= 0) {
-      errors.location = 'Location is required and should be a positive number';
+    if (!location.trim()) {
+      errors.location = 'Location is required';
       isValid = false;
     }
 
@@ -56,38 +77,74 @@ const AddHackathon = (props: AddHackathonProps) => {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    if (!user?._id) return // err msg
+  const handleImageDrop = (files: File[]) => {
+    setFiles(files);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!user?._id) return;
+
     if (validatePost()) {
-      addHackathon({
-        comments: [],
-        creator: user?._id,
-        dateCreated: new Date(Date.now()),
-        description: description,
-        endDate: new Date(Date.now()),
-        imgs: [],
-        likes: [],
-        location: { lat: 32, lon: 31 },
-        startDate: new Date(Date.now())
-      }).then(res => {
-        addHackathonsToState(res?.data)
+      try {
+        let imageUrls: string[] = existingImages;
+
+        if (files.length > 0) {
+          const formData = new FormData();
+          files.forEach((file) => {
+            formData.append('file', file);
+          });
+
+          const uploadResponse = await axios.post('http://localhost:6969/file', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          imageUrls = uploadResponse.data.urls;
+        }
+
+        const hackathonData: AddHackathonDto = {
+          creator: user._id,
+          location: location,
+          startDate: startDate?.toDate() || new Date(),
+          endDate: endDate?.toDate() || new Date(),
+          description,
+          comments: [],
+          imgs: [...imageUrls, ...existingImages],
+          likes: [],
+          dateCreated: new Date(),
+        };
+
+        let response;
+
+        if (props.updateMode && id) {
+          response = await updateHackathon(id, hackathonData);
+        } else {
+          response = await addHackathon(hackathonData);
+        }
+
+        const newHackathon: Hackathon = response.data;
+        addHackathonsToState(newHackathon);
+
         setDescription('');
         setStartDate(null);
         setEndDate(null);
-        setLocation(null);
+        setLocation('');
+        setFiles([]);
         setErrors({});
-        setSnackOpen(true)
-        setSnackText("Hackathon added successfully")
-      }).catch(err => {
-        console.error(err)
-      })
+        opanStackbar(`Hackathon ${props.updateMode ? 'updated' : 'added'} successfully`, 'success');
+        navigate('/hackathon/view');
+      } catch (error) {
+        console.error(error);
+        opanStackbar(`Failed to ${props.updateMode ? 'update' : 'add'} hackathon`, 'error');
+      }
     }
   };
 
   return (
     <Box className="add-hackathon">
-      <h2>Add Hackathon</h2>
+      <h2>{id ? 'Update Hackathon' : 'Add Hackathon'}</h2>
       <Box component="form" onSubmit={handleSubmit} className="post-hackathon">
         <Box className="form-group">
           <TextField
@@ -104,9 +161,8 @@ const AddHackathon = (props: AddHackathonProps) => {
         <Box className="form-group">
           <TextField
             label="Location"
-            type="number"
             value={location !== null ? location : ''}
-            onChange={(e) => setLocation(e.target.value ? parseInt(e.target.value) : null)}
+            onChange={(e) => setLocation(e.target.value)}
             error={Boolean(errors.location)}
             helperText={errors.location}
             fullWidth
@@ -118,7 +174,7 @@ const AddHackathon = (props: AddHackathonProps) => {
               <DatePicker
                 label="Start Date"
                 value={startDate}
-                onChange={(date: Date | null) => setStartDate(date)}
+                onChange={(date) => setStartDate(date)}
                 slotProps={{ textField: { error: Boolean(errors.startDate), helperText: errors.startDate } }}
               />
             </Box>
@@ -126,24 +182,39 @@ const AddHackathon = (props: AddHackathonProps) => {
               <DatePicker
                 label="End Date"
                 value={endDate}
-                onChange={(date: Date | null) => setEndDate(date)}
+                onChange={(date) => setEndDate(date)}
                 slotProps={{ textField: { error: Boolean(errors.endDate), helperText: errors.endDate } }}
               />
             </Box>
           </LocalizationProvider>
         </Box>
         <Box className='form-group'>
-          <ImageDropZone />
+          <ImageDropZone onDrop={handleImageDrop} />
+          {existingImages.length > 0 && (
+            <Box>
+              <h3>Existing Images</h3>
+              <Box className="existing-images">
+
+                <ImageList sx={{ height: 250 }} cols={3} rowHeight={164}>
+                  {existingImages.map((img, idx) => (
+                    <ImageListItem key={idx}>
+                      <img
+                        srcSet={`${img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                        src={`${img}?w=164&h=164&fit=crop&auto=format`}
+                        alt={img}
+                        loading="lazy"
+                      />
+                    </ImageListItem>
+                  ))}
+                </ImageList>
+              </Box>
+            </Box>
+          )}
         </Box>
         <Button variant="contained" color="primary" type="submit" className="hac-btn" fullWidth>
-          Post
+          {id ? 'Update' : 'Post'}
         </Button>
       </Box>
-
-      <Snackbar open={snackOpen} onClose={() => {
-        setSnackOpen(false)
-        setSnackText('')
-      }} text={snackText} />
     </Box>
   );
 };

@@ -2,13 +2,12 @@ import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import zukeeper from "zukeeper"
 
-
-//TODO: extracr type
 interface User {
     _id: string;
     email: string,
     firstName: string,
     lastName: string,
+    imgUrl: string
 }
 
 interface UserState {
