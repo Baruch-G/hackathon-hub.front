@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseurl = "http://localhost:6969";
+const baseurl = "https://hackathon-hub-server.onrender.com";
 
 export const GET = (path: string) => {
   return axios.get(`${baseurl}/${path}`);

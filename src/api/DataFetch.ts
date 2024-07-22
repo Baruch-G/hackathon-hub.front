@@ -79,7 +79,7 @@ export const uploadImages = async (files: File[]): Promise<string[]> => {
 
   try {
     const response = await axios.post(
-      "http://localhost:6969/hackathon/upload-images ",
+      "https://hackathon-hub-server.onrender.com/hackathon/upload-images ",
       formData,
       {
         headers: {

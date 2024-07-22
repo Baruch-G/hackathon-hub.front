@@ -5,6 +5,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import "./Login.css";
 import { login } from "../../api/DataFetch";
 import useUserStore from "../../state/UserStore";
+import { GoogleLogin } from "@react-oauth/google";
 
 interface PostUser {
     email: string;
@@ -119,6 +120,8 @@ const Login = (props: LoginProps) => {
             </Button>
 
             <p className="no-account">Dont have ab account ? <a onClick={props.onRegisterClicked} className="register-now">Register now</a></p>
+
+            <GoogleLogin onSuccess={() => { }} onError={() => { }} />
         </div>
     );
 };

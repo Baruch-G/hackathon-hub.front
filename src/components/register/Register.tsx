@@ -115,7 +115,7 @@ const Register = (props: RegisterProps) => {
             if (selectedImage) {
                 const formData = new FormData();
                 formData.append('file', selectedImage);
-                const uploadResponse = await axios.post('http://localhost:6969/file', formData, {
+                const uploadResponse = await axios.post('https://hackathon-hub-server.onrender.com/file', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -136,7 +136,7 @@ const Register = (props: RegisterProps) => {
             if (props.editMode && user) {
                 // Update user API call
                 try {
-                    const response = await axios.put(`http://localhost:6969/auth/users/${user._id}`, userPayload);
+                    const response = await axios.put(`https://hackathon-hub-server.onrender.com/auth/users/${user._id}`, userPayload);
 
                     if (response?.data) {
                         setUser({
@@ -180,53 +180,6 @@ const Register = (props: RegisterProps) => {
             }
         }
     };
-
-
-    // const handleSubmit = async () => {
-    //     if (validate()) {
-    //         let profileImgUrl = '';
-    //         if (selectedImage) {
-    //             const formData = new FormData();
-    //             formData.append('file', selectedImage);
-    //             const uploadResponse = await axios.post('http://localhost:6969/file', formData, {
-    //                 headers: {
-    //                     'Content-Type': 'multipart/form-data'
-    //                 }
-    //             });
-
-    //             profileImgUrl = uploadResponse.data?.urls[0] ?? ''
-    //         }
-
-    //         register({
-    //             firstName: userValues.firstName,
-    //             lastName: userValues.lastName,
-    //             email: userValues.email,
-    //             imgUrl: profileImgUrl.replace('\\', '//'),
-    //             // phoneNumber: userValues.phoneNumber,
-    //             password: userValues.password
-    //         }).then(res => {
-    //             login({
-    //                 email: userValues.email,
-    //                 password: userValues.password
-    //             }).then(res => {
-    //                 if (res?.data?.user) {
-    //                     setUser({
-    //                         firstName: res.data.user.firstName,
-    //                         lastName: res.data.user.lastName,
-    //                         email: res.data.user.email,
-    //                         _id: res.data.user._id,
-    //                         imgUrl: res.data.user.imgUrl
-    //                     })
-    //                     props.onConfirm();
-    //                 }
-    //             }).catch(e => {
-    //                 setApiError(e?.response?.data?.message || "An error occurred during login. Please try again.");
-    //             });
-    //         }).catch(e => {
-    //             setApiError(e?.response?.data.message || "An error occurred during registration. Please try again.");
-    //         });
-    //     }
-    // };
 
     return (
         <div className="registration-wrapper">
