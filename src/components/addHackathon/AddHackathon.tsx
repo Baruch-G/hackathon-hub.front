@@ -96,7 +96,7 @@ const AddHackathon = (props: AddHackathonProps) => {
             formData.append('file', file);
           });
 
-          const uploadResponse = await axios.post('https://hackathon-hub-server.onrender.com', formData, {
+          const uploadResponse = await axios.post('https://hackathon-hub-server.onrender.com/file', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
