@@ -37,7 +37,7 @@ const TopProfile = () => {
 
 
     return (
-        user &&
+        user ?
         <div className='top-profile'>
             <div>{user?.firstName}</div>
             {/* <img src={user.imgUrl} alt={`name`} className="top-profile-img" /> */}
@@ -130,7 +130,7 @@ const TopProfile = () => {
                     <Register editMode onLoginClicked={() => { }} onConfirm={() => { }} />
                 </Box>
             </Modal>
-        </div>
+        </div> : <></>
     )
 }
 
