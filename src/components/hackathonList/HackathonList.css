@@ -1,0 +1,139 @@
+/* HackathonList.css */
+
+.hackathon-list {
+  max-width: 1000px;
+  margin: 0 auto;
+  margin-bottom: 50px;
+}
+
+.hackathon-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hackathon-header {
+  display: grid;
+  gap: 15px;
+}
+
+.location-details-container {
+  display: grid;
+  gap: 10px;
+  color: var(--lp-tabs-unselected, #6b778c);;
+}
+
+.hackthon-poster-profile,
+.location-details {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.location-details {
+  cursor: pointer;
+  gap: 5px;
+}
+
+.hackathon-poster-name {
+  cursor: pointer;
+}
+
+.hackathon-poster-name:hover {
+  color: #054475;
+}
+
+.profile-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.hackathon-details {
+  margin-bottom: 10px;
+}
+
+.hackathon-actions {
+  display: flex;
+  gap: 20px;
+}
+
+.hackathon-actions {
+  display: flex;
+  gap: 20px;
+}
+
+.action-container {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.num-likes, .num-comments {
+  font-size: 1rem;
+  color: #555;
+}
+
+.icon-button {
+  cursor: pointer;
+  font-size: 1.3rem;
+  color: #555;
+  transition: transform 0.3s ease-in-out, color 0.2s ease-in-out;
+}
+
+.icon-fill {
+  color: #054475;
+}
+
+.icon-button:hover {
+  transform: scale(1.2);
+  color: #054475;
+}
+
+.icon-button:active {
+  transform: scale(1.3);
+}
+.hackathon-comments {
+  margin-top: 10px;
+}
+
+.comments-toggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.comment-list li {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.comment-list li .profile-img {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.comment {
+  display: flex;
+  gap: 7px;
+  padding: 7px;
+}
+
+.comment-profile-img-container > .profile-img {
+  width: 30px;
+  height: 30px;
+}
+
+.comment-t{
+  margin-top: 7px;
+}
+
+.own-user-actions{
+  margin-left: auto;
+  display: flex;
+  gap: 15px;
+}

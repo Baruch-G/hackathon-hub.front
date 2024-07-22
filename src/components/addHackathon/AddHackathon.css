@@ -1,0 +1,30 @@
+.add-hackathon {
+  max-width: 1000px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-hackathon h2 {
+  text-align: center;
+}
+
+.post-hackathon {
+  display: grid;
+  gap: 15px;
+}
+
+.post-hackathon .form-group {
+  margin-bottom: 15px;
+}
+
+.date-range-inputs {
+  display: flex;
+  gap: 30px;
+}
+
+.MuiDayCalendar-weekContainer .css-23p0if-MuiButtonBase-root-MuiPickersDay-root.Mui-selected:hover{
+  background-color: #054475;
+}
